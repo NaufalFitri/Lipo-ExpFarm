@@ -1,10 +1,9 @@
 package dev.lipoteam.expFarm;
 
-import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -23,25 +22,32 @@ public class Events implements Listener {
     private int percentage;
     private int firstrange;
     private int lastrange;
-    private Configurations config;
+    private int fusemultiplier;
+    private int explosion;
 
+    private boolean nodrops;
+    private boolean notools;
+    private boolean nodamage;
     private boolean multiplier;
 
-    private final ExpFarm plugin;
-
-    public Events(Configurations config, ExpFarm plugin) {
-        this.plugin = plugin;
+    public Events(Configurations config) {
         setConfig(config);
     }
 
     public void setConfig(Configurations config) {
+
         this.worlds = config.worlds();
         this.mobs = config.EntityTypes();
         this.multiplier = config.ExpMultiplier();
         this.percentage = config.ExpMultiplierPercentage();
         this.firstrange = config.FirstMultiplierRange();
         this.lastrange = config.LastMultiplierRange();
-        this.config = config;
+        this.nodrops = config.NoDrops();
+        this.notools = config.NoTools();
+        this.nodamage = config.DamageTaken();
+        this.fusemultiplier = config.FuseMultiplier();
+        this.explosion = config.ExplosionRadius();
+
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
@@ -51,28 +57,32 @@ public class Events implements Listener {
 
         EntityType type = e.getEntityType();
 
-        if (!worlds.contains(e.getLocation().getWorld().getName())) {
-            return;
+        World world = e.getLocation().getWorld();
+
+        if (world != null) {
+            if (!worlds.contains(world.getName())) {
+                return;
+            }
         }
 
-        if (!(e.getEntity() instanceof LivingEntity)) {
+        if (!(e.getEntity() instanceof LivingEntity entity)) {
             return;
         }
-
-        LivingEntity entity = (LivingEntity) e.getEntity();
 
         if (mobs.contains(type)) {
 
             EntityEquipment equipment = entity.getEquipment();
-            if (equipment != null) {
+            if (equipment != null && notools) {
                 equipment.clear();
             }
 
             if (type == EntityType.CREEPER) {
+
                 Creeper creeper = (Creeper) entity;
-                creeper.setMaxFuseTicks(creeper.getMaxFuseTicks() * 100);
-                creeper.setFuseTicks(creeper.getFuseTicks() * 100);
-                creeper.setExplosionRadius(0);
+                creeper.setMaxFuseTicks(creeper.getMaxFuseTicks() * fusemultiplier);
+                creeper.setFuseTicks(creeper.getFuseTicks() * fusemultiplier);
+                creeper.setExplosionRadius(explosion);
+
             }
         }
 
@@ -83,22 +93,32 @@ public class Events implements Listener {
 
         EntityType type = e.getEntityType();
 
-        if (!worlds.contains(e.getEntity().getLocation().getWorld().getName())) {
-            return;
+        World world = e.getEntity().getLocation().getWorld();
+
+        if (world != null) {
+            if (!worlds.contains(world.getName())) {
+                return;
+            }
         }
+
+        if (nodrops)
+            e.getDrops().clear();
 
         if (mobs.contains(type)) {
 
-            e.getDrops().clear();
             if (multiplier) {
+
                 int ranp = new Random().nextInt(100);
                 int ranm = new Random().nextInt(firstrange, lastrange);
+
                 if (e.getDamageSource().getCausingEntity() != null) {
                     if (ranp < percentage && e.getDamageSource().getCausingEntity().getType() == EntityType.PLAYER) {
+
                         e.setDroppedExp(e.getDroppedExp() * ranm);
                         Player player = (Player) e.getDamageSource().getCausingEntity();
                         String text = "&9Exp &fmultiplied by &9" + ranm + "x";
                         player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.translateAlternateColorCodes('&', text)));
+
                     }
                 }
             }
@@ -112,7 +132,15 @@ public class Events implements Listener {
 
         EntityType type = e.getEntityType();
 
-        if (!worlds.contains(e.getEntity().getLocation().getWorld().getName())) {
+        World world = e.getEntity().getLocation().getWorld();
+
+        if (world != null) {
+            if (!worlds.contains(world.getName())) {
+                return;
+            }
+        }
+
+        if (!nodamage) {
             return;
         }
 

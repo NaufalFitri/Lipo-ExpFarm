@@ -2,5 +2,5 @@ name: ExpFarm
 version: '1.21.1-1.0'
 main: dev.lipoteam.expFarm.ExpFarm
 api-version: '1.21'
-authors: [ Nopal ]
-description: Library For Orang
+authors: [ Nopal, zflrr ]
+description: ExpFarm made by Lipo Team

@@ -1,3 +1,51 @@
+<div align="center">
+
+![GitHub](https://img.shields.io/github/license/NaufalFitri/Lipo-ExpFarm?style=flat-square)
+[![Join us on Discord](https://img.shields.io/discord/1040175857462943788.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2&style=flat-square)](https://discord.com/invite/4DtDBGtST4)
+
+</div>
+
+<h2 align="center">
+  <img src="lipomc.png" alt="LipoMC Logo" width="400">
+  <br>
+    <br>
+  A Plugin Developed by LipoTeam
+    <br>
+    <h4 align="center">
+    This plugin is licensed under the GNU General Public License v3.0. See the LICENSE file for details.
+    </h4>
+<br>
+</h2>
+
+**Compatible Minecraft Server Versions**
+
+- Our plugin has been tested on Minecraft version 1.21.1, but it should be compatible with server versions up to 1.21.3.
+
+---
+
+## Offers
+
+Our ExpFarm plugin offers a various configuration options for server owners
+to customize the configuration file to their preferences.
+
+**Configuration Options Include**
+
+- Enable or Disable Multiplier of the specified mobs killed.
+- Customize the Multiplier characteristics.
+- Add or Remove mobs to be affected by ExpFarm plugin.
+- Disable Damage taken in specified worlds.
+- Customize the spawner spawn time.
+- Enable or Disable particle to indicate radius of spawner to activate.
+- Customize the particle characteristics.
+- Customize the spawner radius
+- Customize the radius type (circle or square).
+- Customize the mobs characteristics
+---
+## Configuration
+<details>
+<summary><b>Default</b></summary>
+
+```
 # prefix for the plugin
 prefix: '&8[&9&l!&8] &9&lExpFarm &8»&f'
 
@@ -86,3 +134,8 @@ ExpFarm:
 
       # Option to make the mobs in world specified have drops or not
       no-drops: true
+```
+
+</details>
+
+

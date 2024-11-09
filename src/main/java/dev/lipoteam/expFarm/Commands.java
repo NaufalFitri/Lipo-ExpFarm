@@ -1,18 +1,13 @@
 package dev.lipoteam.expFarm;
 
-import dev.jorel.commandapi.BukkitTooltip;
 import dev.jorel.commandapi.CommandAPICommand;
-import dev.jorel.commandapi.Tooltip;
 import dev.jorel.commandapi.arguments.EntityTypeArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.SafeSuggestions;
+import org.bukkit.Location;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 
 public class Commands {
 
@@ -25,7 +20,7 @@ public class Commands {
         ConsoleCommandSender console = plugin.getServer().getConsoleSender();
 
         new CommandAPICommand("expfarm")
-                .withAliases("xpfarm")
+                .withAliases("xpf")
                 .withPermission("expfarm.commands")
                 .withSubcommand(new CommandAPICommand("reload")
                         .withPermission("expfarm.commands.reload")
@@ -50,11 +45,21 @@ public class Commands {
                                 }))
                         .withSubcommand(new CommandAPICommand("remove")
                                 .withArguments(new IntegerArgument("id").replaceSafeSuggestions(SafeSuggestions.suggest(
-                                        info -> config.Ids().keySet().toArray(new Integer[0])
+                                        info -> plugin.Ids().keySet().toArray(new Integer[0])
                                 )))
                                 .executesPlayer((sender, args) -> {
-                                    if (config.Ids().keySet().contains((Integer) args.get("id")))
+                                    if (plugin.Ids().containsKey((Integer) args.get("id")))
                                         plugin.getMethod().RemoveSpawner((Integer) args.get("id"));
+                                }))
+                        .withSubcommand(new CommandAPICommand("nearby")
+                                .withArguments(new IntegerArgument("distance"))
+                                .executesPlayer((sender, args) -> {
+                                    for (Integer locid : plugin.Ids().keySet()) {
+                                        Location loc = plugin.Ids().get(locid).getKey();
+                                        if (sender.getLocation().distance(loc) < (int) args.get("distance")) {
+                                            sender.sendMessage(config.prefix("Nearby spawner id: " + locid + " (" + config.roundLocation(loc) + ")"));
+                                        }
+                                    }
                                 })))
                 .register();
     }
