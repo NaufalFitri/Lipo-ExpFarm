@@ -134,6 +134,9 @@ ExpFarm:
 
       # Option to make the mobs in world specified have drops or not
       no-drops: true
+
+      # Option to make the specified entity cannot teleport (mostly for enderman)
+      no-teleport: true
 ```
 
 </details>
