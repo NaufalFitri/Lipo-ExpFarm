@@ -51,7 +51,7 @@ public class Method {
         double z = player.getLocation().getZ();
         World world = player.getWorld();
 
-        int task = SpawnerMethod(loc, type);
+        int task = SpawnerMethod(player.getLocation(), type);
         int id = config.ListSpawner().size() + 1;
 
         List<String> listspawners = config.ListSpawner();
