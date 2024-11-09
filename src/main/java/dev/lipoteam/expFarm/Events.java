@@ -11,6 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.inventory.EntityEquipment;
 
 import java.util.*;
@@ -29,6 +30,7 @@ public class Events implements Listener {
     private boolean notools;
     private boolean nodamage;
     private boolean multiplier;
+    private boolean noteleport;
 
     public Events(Configurations config) {
         setConfig(config);
@@ -47,6 +49,7 @@ public class Events implements Listener {
         this.nodamage = config.DamageTaken();
         this.fusemultiplier = config.FuseMultiplier();
         this.explosion = config.ExplosionRadius();
+        this.noteleport = config.NoTeleport();
 
     }
 
@@ -148,6 +151,26 @@ public class Events implements Listener {
             e.setCancelled(true);
         }
 
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void OnEntityTeleports(EntityTeleportEvent e) {
+
+        EntityType type = e.getEntityType();
+
+        World world = e.getEntity().getLocation().getWorld();
+
+        if (world != null) {
+            if (!worlds.contains(world.getName())) {
+                return;
+            }
+        }
+
+        if (!mobs.contains(type) && noteleport) {
+            return;
+        }
+
+        e.setCancelled(true);
 
     }
 

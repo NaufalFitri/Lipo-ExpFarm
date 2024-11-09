@@ -130,6 +130,10 @@ public class Configurations {
         return config.getInt("ExpFarm.spawner-options.spawn-time") * 20L;
     }
 
+    public boolean NoTeleport() {
+        return config.getBoolean("ExpFarm.spawner-options.mobs.no-teleport");
+    }
+
     public String roundLocation(Location loc) {
         double x = Math.round(loc.getX() * 100.0) / 100.0;
         double y = Math.round(loc.getY() * 100.0) / 100.0;
