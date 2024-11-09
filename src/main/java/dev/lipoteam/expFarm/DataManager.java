@@ -1,9 +1,9 @@
-package dev.lipoteam.treeCapitator;
+package dev.lipoteam.expFarm;
 
-import com.jeff_media.customblockdata.CustomBlockData;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.TextDisplay;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -11,6 +11,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
+import org.w3c.dom.Text;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -59,15 +60,16 @@ public class DataManager {
                 case null, default -> playerData.set(key, PersistentDataType.STRING, serialize(data));
             }
 
-        } else if (what instanceof Block) {
-            PersistentDataContainer blockData = new CustomBlockData((Block) what, plugin);
+        } else if (what instanceof TextDisplay) {
+            PersistentDataContainer displayData = ((TextDisplay) what).getPersistentDataContainer();
             switch (data) {
-                case String s -> blockData.set(key, PersistentDataType.STRING, s);
-                case Integer i -> blockData.set(key, PersistentDataType.INTEGER, i);
-                case Boolean b -> blockData.set(key, PersistentDataType.BOOLEAN, b);
-                case Double d -> blockData.set(key, PersistentDataType.DOUBLE, d);
-                case null, default -> blockData.set(key, PersistentDataType.STRING, serialize(data));
+                case String s -> displayData.set(key, PersistentDataType.STRING, s);
+                case Integer i -> displayData.set(key, PersistentDataType.INTEGER, i);
+                case Boolean b -> displayData.set(key, PersistentDataType.BOOLEAN, b);
+                case Double d -> displayData.set(key, PersistentDataType.DOUBLE, d);
+                case null, default -> displayData.set(key, PersistentDataType.STRING, serialize(data));
             }
+            System.out.println("test");
         }
 
     }
@@ -90,10 +92,11 @@ public class DataManager {
             PersistentDataContainer playerData = ((Player) what).getPersistentDataContainer();
             playerData.remove(key);
 
-        } else if (what instanceof Block) {
+        } else if (what instanceof  TextDisplay) {
 
-            PersistentDataContainer blockData = new CustomBlockData((Block) what, plugin);
-            blockData.remove(key);
+            PersistentDataContainer displayData = ((TextDisplay) what).getPersistentDataContainer();
+            displayData.remove(key);
+
         }
 
     }
@@ -156,12 +159,17 @@ public class DataManager {
                 PersistentDataContainer data = whatMeta.getPersistentDataContainer();
                 return data.has(key);
             }
+
         } else if (what instanceof Player) {
+
             PersistentDataContainer data = ((Player) what).getPersistentDataContainer();
             return data.has(key);
-        } else if (what instanceof Block) {
-            PersistentDataContainer data = new CustomBlockData((Block) what, plugin);
+
+        } else if (what instanceof  TextDisplay) {
+
+            PersistentDataContainer data = ((TextDisplay) what).getPersistentDataContainer();
             return data.has(key);
+
         }
 
         return false;

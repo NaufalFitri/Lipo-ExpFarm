@@ -1,0 +1,25 @@
+# prefix for the plugin
+prefix: '&8[&9&l!&8] &9&lExpFarm &8»&f'
+
+ExpFarm:
+  enabled: true
+
+  multiplier:
+    enabled: true
+    percentage: 50
+    first-range: 2
+    last-range: 4
+
+  spawner-options:
+    y-offset: 1
+
+  entity-type:
+    - ZOMBIE
+    - SKELETON
+    - CREEPER
+    - ENDERMAN
+
+  spawners: []
+
+  worlds:
+    - world

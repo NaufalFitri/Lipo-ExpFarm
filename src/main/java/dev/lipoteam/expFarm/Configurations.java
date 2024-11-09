@@ -1,19 +1,28 @@
-package dev.lipoteam.treeCapitator;
+package dev.lipoteam.expFarm;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 
-import java.util.List;
+import java.util.*;
 
 public class Configurations {
 
     private final FileConfiguration config;
+    private final ExpFarm plugin;
 
-    public Configurations(FileConfiguration config) {
+    private Map<Location, EntityType> spawners;
+    private final Map<Integer, AbstractMap.SimpleEntry<Location, EntityType>> identifiers = new HashMap<>();
+    private final Map<Integer, Integer> taskIds = new HashMap<>();
+
+    public Configurations(FileConfiguration config, ExpFarm plugin) {
+        this.plugin = plugin;
         this.config = config;
+        LoadSpawner();
     }
 
     public String prefix(String text) {
@@ -22,70 +31,100 @@ public class Configurations {
     }
 
     public Boolean isEnabled() {
-        return config.getBoolean("TreeCapitator.enabled");
-    }
-
-    public boolean isAsyncMode() {
-        return config.getBoolean("TreeCapitator.async");
-    }
-
-    public boolean isDelay() {
-        return config.getBoolean("TreeCapitator.delay.enabled");
-    }
-
-    public boolean BAP() {
-        return config.getBoolean("TreeCapitator.delay.BAP");
-    }
-
-    public boolean haveParticle() {
-        return config.getBoolean("TreeCapitator.particle.enabled");
-    }
-
-    public boolean canDamage() {
-        return config.getBoolean("TreeCapitator.damage.enabled");
-    }
-
-    public boolean needSneak() {
-        return config.getBoolean("TreeCapitator.needsneak");
-    }
-
-    public boolean isUnbreakingInfluence() {
-        return config.getBoolean("TreeCapitator.damage.unbreakingInfluence");
-    }
-
-    public boolean isParticleSoundable() {
-        return config.getBoolean("TreeCapitator.particle.sound.enabled");
-    }
-
-    public Particle particle() {
-        return Particle.valueOf(config.getString("TreeCapitator.particle.type"));
-    }
-
-    public int particlePercentage() {
-        return config.getInt("TreeCapitator.particle.percentage");
-    }
-
-    public Sound particleSound() {
-        return Sound.valueOf(config.getString("TreeCapitator.particle.sound.name"));
-    }
-
-    public int particleAmount() {
-        return config.getInt("TreeCapitator.particle.amount");
-    }
-
-    public Double particleSpeed() {
-        return config.getDouble("TreeCapitator.particle.speed");
-    }
-
-    public Long delayTime() {
-        return config.getLong("TreeCapitator.delay.time");
-    }
-
-    public int extraDamage() {
-        return config.getInt("TreeCapitator.damage.extraDamage");
+        return config.getBoolean("ExpFarm.enabled");
     }
 
     public List<String> worlds() {
-        return config.getStringList("TreeCapitator.worlds");
+        return config.getStringList("ExpFarm.worlds");
     }
+
+    public List<EntityType> EntityTypes() {
+        List<String> entities = config.getStringList("ExpFarm.entity-type");
+        List<EntityType> types = new ArrayList<>();
+
+        for (String list : entities) {
+            types.add(EntityType.valueOf(list));
+        }
+
+        return types;
+    }
+
+    public boolean ExpMultiplier() {
+        return config.getBoolean("ExpFarm.multiplier.enabled");
+    }
+
+    public int ExpMultiplierPercentage() {
+        return config.getInt("ExpFarm.multiplier.percentage");
+    }
+
+    public int FirstMultiplierRange() {
+        return config.getInt("ExpFarm.multiplier.first-range");
+    }
+
+    public int LastMultiplierRange() {
+        return config.getInt("ExpFarm.multiplier.last-range");
+    }
+
+    public int YOffset() {
+        return config.getInt("ExpFarm.spawner-options.y-offset");
+    }
+
+    public void LoadSpawner() {
+
+        List<String> spawnerloc = config.getStringList("ExpFarm.spawners");
+        System.out.println(spawnerloc);
+        Map<Location, EntityType> spawners = new HashMap<>();
+
+        for (String str : spawnerloc) {
+            String[] split = str.split(" ");
+
+            int id = Integer.parseInt(split[0]);
+            World world = plugin.getServer().getWorld(split[1]);
+
+            double x = Double.parseDouble(split[2]);
+            double y = Double.parseDouble(split[3]);
+            double z = Double.parseDouble(split[4]);
+
+            Location loc = new Location(world, x, y, z);
+            EntityType spawn = EntityType.valueOf(split[5]);
+
+            int task = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+                @Override
+                public void run() {
+
+                    int ranx = new Random().nextInt(-2,2);
+                    int ranz = new Random().nextInt(-2,2);
+                    int nearby = loc.getWorld().getNearbyEntities(loc, 10, 10, 10, entity -> entity instanceof Player).size();
+
+                    if (nearby > 0) {
+                        loc.getWorld().spawn(loc.add(ranx, 0, ranz), spawn.getEntityClass());
+                    }
+
+                }
+            }, 0L, 100L);;
+
+            spawners.put(loc, spawn);
+            taskIds.put(id, task);
+            identifiers.put(id, new AbstractMap.SimpleEntry<>(loc, spawn));
+        }
+        this.spawners = spawners;
+
+    }
+
+    public Map<Location, EntityType> Spawners() {
+        return spawners;
+    }
+
+    public Map<Integer, AbstractMap.SimpleEntry<Location, EntityType>> Ids() {
+        return identifiers;
+    }
+
+    public List<String> ListSpawner() {
+        return config.getStringList("ExpFarm.spawners");
+    }
+
+    public Map<Integer, Integer> TaskList() {
+        return taskIds;
+    }
+
 }
