@@ -72,7 +72,7 @@ public class Method {
 
             Location spawnloc = loc.clone();
             World world = loc.getWorld();
-            BoundingBox box = BoundingBox.of(loc, config.SpawnRadius(),0,config.SpawnRadius());
+            BoundingBox box = BoundingBox.of(loc, config.SpawnRadius(),5,config.SpawnRadius());
 
             boolean nearby = false;
 
@@ -85,7 +85,12 @@ public class Method {
             if (config.RadiusType() == 1) {
 
                 for (Player player : players) {
-                    if (player.getLocation().distance(loc) < config.SpawnRadius()) {
+
+                    double px = player.getLocation().getX();
+                    double py = player.getLocation().getY();
+                    double pz = player.getLocation().getZ();
+
+                    if (box.contains(px, py, pz)) {
                         nearby = true;
                     }
                 }
@@ -94,7 +99,7 @@ public class Method {
 
                     for (double i = box.getMinX(); i <= box.getMaxX(); i += 0.25) {
                         for (double j = box.getMinZ(); j <= box.getMaxZ(); j += 0.25) {
-                            Location newloc = new Location(loc.getWorld(), i, loc.getY(), j);
+                            Location newloc = new Location(world, i, loc.getY(), j);
                             if (world != null) {
                                 if (i == box.getMinX() || i == box.getMaxX()) {
                                     world.spawnParticle(config.ParticleType(), newloc, config.ParticleQuantity(), 0, 0, 0, config.ParticleSpeed());
@@ -110,7 +115,7 @@ public class Method {
             } else {
 
                 for (Player player : players) {
-                    if (player.getLocation().distanceSquared(loc) < Math.pow(config.SpawnRadius(), 2)) {
+                    if (player.getLocation().distance(loc) < config.SpawnRadius()) {
                         nearby = true;
                     }
                 }
